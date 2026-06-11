@@ -1,0 +1,24 @@
+{
+    "name": "GameTestsAssembly",
+    "rootNamespace": "",
+    "references": [
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:2d261c4f5c285504096919756261f650",
+        "GUID:428b41b614acd3d4ba8e890a676d404b",
+        "GUID:d8bf1a1f25a81e9439f6aec214c20e65",
+        "GUID:baf21e5783d92ed43ab7abee312cc42c",
+        "GUID:ee092712a702af242a4fe1673f2c6fc7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
