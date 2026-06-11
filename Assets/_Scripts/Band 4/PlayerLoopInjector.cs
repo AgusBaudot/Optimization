@@ -6,9 +6,9 @@ namespace Sim.View
 {
     public class PlayerLoopInjector
     {
-        private Action<float> OnTick;
+        private Action OnTick;
         
-        public PlayerLoopInjector(Action<float> onTick)
+        public PlayerLoopInjector(Action onTick)
         {
             OnTick = onTick;
             Inject();
@@ -79,7 +79,7 @@ namespace Sim.View
 
         private void SimulationRunner()
         {
-            OnTick?.Invoke(UnityEngine.Time.deltaTime);
+            OnTick?.Invoke();
         }
         
         private struct SimulationUpdateTag{}

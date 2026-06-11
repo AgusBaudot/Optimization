@@ -1,5 +1,6 @@
 ﻿using Sim.Entities;
 using Sim.Foundation;
+using UnityEngine;
 
 namespace Sim.Systems
 {
@@ -48,6 +49,7 @@ namespace Sim.Systems
             registry.TryCreateEntity(EntityType.Bullet, out var bullet);
             EntityData bulletData = registry[bullet];
             SimVec2 direction = (_inputContainer.Input.MousePosition - playerPosition).normalized;
+            Debug.Log(direction);
             if (direction.Equals(SimVec2.zero))
             {
                 direction = SimVec2.right;

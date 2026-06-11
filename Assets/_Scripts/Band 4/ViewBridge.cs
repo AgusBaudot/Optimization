@@ -13,7 +13,8 @@ namespace Sim.View
         private GameObject _enemyPrefab;
 
         private readonly Dictionary<EntityId, GameObject> _activeViews = new();
-        private readonly Queue<GameObject> _poolViews = new(128);
+        private readonly Queue<GameObject> _bulletViews = new(15);
+        private readonly Queue<GameObject> _enemyViews = new(50);
         
         //1. Read engine.Front
         //2. For each EntityView in the snapshot, if state == alive, ensure a GameObject exists for it. If state != alive, ensure no GO is visible.
@@ -25,9 +26,20 @@ namespace Sim.View
             _bulletPrefab = bulletPrefab;
             _enemyPrefab = enemyPrefab;
 
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < 50; i++)
             {
-                _poolViews.Enqueue(new GameObject(i.ToString()));
+                if (i < 15)
+                {
+                    var bullet = Object.Instantiate(_bulletPrefab);
+                    bullet.name = $"{EntityType.Bullet}_{i}";
+                    bullet.SetActive(false);
+                    _bulletViews.Enqueue(bullet);
+                }
+
+                var enemy = Object.Instantiate(enemyPrefab);
+                enemy.name = $"{EntityType.Enemy}_{i}";
+                enemy.SetActive(false);
+                _enemyViews.Enqueue(enemy);
             }
         }
 
@@ -37,51 +49,108 @@ namespace Sim.View
             
             foreach (EntityView entity in currentSnapshot.Entities)
             {
-                //If snapshot has entity that's alive and not in dictionary, Spawn.
-                if (entity.State == EntityState.Alive && !_activeViews.ContainsKey(entity.EntityId))
+                //Cache lookup once per frame
+                bool viewExists = _activeViews.TryGetValue(entity.EntityId, out var entityView);
+
+                if (entity.State == EntityState.Alive)
                 {
-                    Spawn(entity);
+                    if (!viewExists)
+                    {
+                        Spawn(entity); // Not in dict? Spawn it.
+                    }
+                    else
+                    {
+                        if (entityView == null)
+                        {
+                            _activeViews.Remove(entity.EntityId);
+                            continue;
+                        }
+
+                        // Already in dict? Update it.
+                        Vector3 position = new Vector3(entity.Position.x, entity.Position.y, 0f);
+                        entityView.transform.position = position;
+                    }
                 }
-                
-                //If snapshot has entity that's not alive and in dictionary, Died.
-                if ((entity.State == EntityState.Dead || entity.State == EntityState.Unused) && _activeViews.ContainsKey(entity.EntityId))
+                else if (viewExists)
                 {
+                    // Dead, but still in dict? Despawn it.
                     Despawn(entity);
                 }
-                
-                //If snapshot has entity that's alive and in dict, Update.
-                if (entity.State == EntityState.Alive && _activeViews.TryGetValue(entity.EntityId, out var entityView))
-                {
-                    Vector3 position = new Vector3(entity.Position.x, entity.Position.y);
-                    entityView.transform.position = position;
-                }
+
+                ////If snapshot has entity that's alive and not in dictionary, Spawn.
+                //if (entity.State == EntityState.Alive && !_activeViews.ContainsKey(entity.EntityId))
+                //{
+                //    Spawn(entity);
+                //}
+
+                ////If snapshot has entity that's not alive and in dictionary, Died.
+                //if (entity.State != EntityState.Alive && _activeViews.ContainsKey(entity.EntityId))
+                //{
+                //    Despawn(entity);
+                //}
+
+                ////If snapshot has entity that's alive and in dict, Update.
+                //if (entity.State == EntityState.Alive && _activeViews.TryGetValue(entity.EntityId, out var entityView))
+                //{
+                //    Vector3 position = new Vector3(entity.Position.x, entity.Position.y);
+                //    entityView.transform.position = position;
+                //}
             }
         }
 
         private void Spawn(EntityView entityView)
         {
-            //Spawn should:
-            //1. Register new entry in dict
-            //2. Get from pool.
-            _activeViews.TryAdd(entityView.EntityId, _poolViews.Dequeue());
-            //3. Initialize accordingly (set sprite and position)
-            Vector3 position = new Vector3(entityView.Position.x, entityView.Position.y);
-            _activeViews[entityView.EntityId].transform.position = position;
-            _activeViews[entityView.EntityId].SetActive(true);
-            //Set sprite according to entity type
-            //4. Enjoy!
+            GameObject spawnedView = null;
+
+            switch (entityView.Type)
+            {
+                case EntityType.Player:
+                    spawnedView = Object.Instantiate(_playerPrefab);
+                    spawnedView.name = "Player_View";
+                    break;
+
+                case EntityType.Bullet:
+                    spawnedView = _bulletViews.Dequeue();
+                    break;
+
+                case EntityType.Enemy:
+                    spawnedView = _enemyViews.Dequeue();
+                    break;
+            }
+
+            if (spawnedView != null)
+            {
+                _activeViews.TryAdd(entityView.EntityId, spawnedView);
+
+                Vector3 position = new Vector3(entityView.Position.x, entityView.Position.y, 0f);
+                spawnedView.transform.position = position;
+                spawnedView.SetActive(true);
+            }
         }
 
         private void Despawn(EntityView entityView)
         {
-            //Despawn should:
-            //1. Kill visual entity (set to false).
-            _activeViews[entityView.EntityId].SetActive(false);
-            //2. Return it to pool.
-            _poolViews.Enqueue(_activeViews[entityView.EntityId]);
-            //3. Remove from dict.
+            if (!_activeViews.TryGetValue(entityView.EntityId, out var viewToDespawn))
+                return;
+
+            viewToDespawn.SetActive(false);
+
+            switch (entityView.Type)
+            {
+                case EntityType.Player:
+                    Object.Destroy(viewToDespawn);
+                    break;
+
+                case EntityType.Bullet:
+                    _bulletViews.Enqueue(viewToDespawn);
+                    break;
+
+                case EntityType.Enemy:
+                    _enemyViews.Enqueue(viewToDespawn);
+                    break;
+            }
+
             _activeViews.Remove(entityView.EntityId);
-            //4. Enjoy!
         }
     }
 }

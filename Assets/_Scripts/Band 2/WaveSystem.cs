@@ -38,7 +38,9 @@ namespace Sim.Systems
                 {
                     _spawnTimeElapsed -= SPAWN_DELAY;
 
-                    SpawnEnemy(registry);
+                    int currentIndex = currentWave.EnemyAmount - _enemiesRemainingToSpawn;
+
+                    SpawnEnemy(registry, currentIndex, currentWave.EnemyAmount);
                     _enemiesRemainingToSpawn--;
                 }
 
@@ -72,17 +74,25 @@ namespace Sim.Systems
                     enemiesRemaining++;
                 }
                 //Wave must end if % of enemies are killed.
-                if (((float)currentWave.EnemyAmount - enemiesRemaining) / (float)currentWave.EnemyAmount >= currentWave.EndInfo.Amount)
+                if ((currentWave.EnemyAmount - enemiesRemaining) / currentWave.EnemyAmount >= currentWave.EndInfo.Amount)
                 {
                     TriggerWaveEnd(registry);
                 }
             }
         }
 
-        private void SpawnEnemy(EntityRegistry registry)
+        private void SpawnEnemy(EntityRegistry registry, int currentIndex, int totalEnemies)
         {
             registry.TryCreateEntity(EntityType.Enemy, out var enemyId);
             var enemy = registry[enemyId];
+
+            float angle = (currentIndex / (float)totalEnemies) * (MathF.PI * 2f);
+
+            float x = MathF.Cos(angle) * _totalWaves[_currentWave].Radius;
+            float y = MathF.Sin(angle) * _totalWaves[_currentWave].Radius;
+
+            enemy.Position = new SimVec2(x, y);
+
             enemy.Health = EntityStats.BASE_ENEMY_HEALTH * _totalWaves[_currentWave].HealthScaling;
             enemy.Damage = EntityStats.BASE_ENEMY_DAMAGE * _totalWaves[_currentWave].DamageScaling;
             registry[enemyId] = enemy;

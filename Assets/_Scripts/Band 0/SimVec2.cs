@@ -84,5 +84,10 @@ namespace Sim.Foundation
             return Math.Abs(x - other.x) < SimMath.Epsilon &&
                    Math.Abs(y - other.y) < SimMath.Epsilon;
         }
+
+        public override string ToString()
+        {
+            return $"x:{x} , y:{y}";
+        }
     }
 }
