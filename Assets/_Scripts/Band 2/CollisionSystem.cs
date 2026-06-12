@@ -42,6 +42,13 @@ namespace Sim.Systems
             }
                     
             var damagedEntity = ShouldTakeDamage(a, b);
+
+            if (damagedEntity.damages.Type == EntityType.Bullet)
+            {
+                damagedEntity.damages.DamageToTake += damagedEntity.damaged.Damage;
+                registry[damagedEntity.damages.Id] = damagedEntity.damages;
+            }
+
             damagedEntity.damaged.DamageToTake += damagedEntity.damages.Damage;
             registry[damagedEntity.damaged.Id] = damagedEntity.damaged;
         }

@@ -45,7 +45,7 @@ namespace Sim.Systems
                     float dirX = dx / distance;
                     float dirY = dy / distance;
 
-                    copy.Velocity = new SimVec2(dirX * EntityStats.ENEMY_SPEED, dirY * EntityStats.ENEMY_SPEED);
+                    copy.Velocity = new SimVec2(dirX * EntityStats.BASE_ENEMY_SPEED, dirY * EntityStats.BASE_ENEMY_SPEED);
                 }
                 else
                 {

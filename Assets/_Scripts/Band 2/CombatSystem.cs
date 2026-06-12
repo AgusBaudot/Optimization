@@ -1,6 +1,5 @@
 ﻿using Sim.Entities;
 using Sim.Foundation;
-using UnityEngine;
 
 namespace Sim.Systems
 {
@@ -25,8 +24,7 @@ namespace Sim.Systems
                     entityData.State = EntityState.Dead;
                     if (entityData.Type == EntityType.Player)
                     {
-                        Debug.LogError("Clean this up");
-                        Application.Quit();
+                        //Lose
                     }
                 }
                 

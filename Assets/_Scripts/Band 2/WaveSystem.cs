@@ -95,6 +95,8 @@ namespace Sim.Systems
 
             enemy.Health = EntityStats.BASE_ENEMY_HEALTH * _totalWaves[_currentWave].HealthScaling;
             enemy.Damage = EntityStats.BASE_ENEMY_DAMAGE * _totalWaves[_currentWave].DamageScaling;
+            enemy.Radius = 0.5f;
+
             registry[enemyId] = enemy;
         }
 

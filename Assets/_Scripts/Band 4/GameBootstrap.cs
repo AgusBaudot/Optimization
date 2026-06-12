@@ -40,7 +40,7 @@ namespace Sim.View
 
             var waves = new WaveConfig[]
             {
-                new WaveConfig(0, 10, 6, new WaveEndInfo(WaveFinishConditionType.KillBased, 1), 1, 1),
+                new WaveConfig(0, 15, 10, new WaveEndInfo(WaveFinishConditionType.KillBased, 1), 1, 1),
                 new WaveConfig(1, 0, 6, new WaveEndInfo(WaveFinishConditionType.TimeBased, 5), 1, 1),
             };
 
@@ -52,6 +52,7 @@ namespace Sim.View
             {
                 new CleanupSystem(),
                 new PlayerControlSystem(_container),
+                new BulletLifetimeSystem(),
                 new EnemyAISystem(),
                 new MovementSystem(),
                 new CollisionSystem(),

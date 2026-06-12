@@ -1,20 +1,17 @@
 ﻿using Sim.Entities;
 using Sim.Foundation;
-using UnityEngine;
 
 namespace Sim.Systems
 {
     public class PlayerControlSystem : ISimSystem
     {
-        private const float INITIAL_COOLDOWN = 1f;
-        
         private readonly InputContainer _inputContainer;
         private float _cooldownRemaining;
         
         public PlayerControlSystem(InputContainer container)
         {
             _inputContainer = container;
-            _cooldownRemaining = INITIAL_COOLDOWN;
+            _cooldownRemaining = EntityStats.BASE_PLAYER_COOLDOWN;
         }
         
         public void Tick(float dt, EntityRegistry registry)
@@ -29,7 +26,7 @@ namespace Sim.Systems
                 }
 
                 player = entity;
-                player.Velocity = _inputContainer.Input.MovementInput;
+                player.Velocity = _inputContainer.Input.MovementInput * EntityStats.BASE_PLAYER_SPEED;
                 registry[entity.Id] =  player;
             }
 
@@ -39,7 +36,7 @@ namespace Sim.Systems
             _cooldownRemaining -= dt;
             if (_cooldownRemaining <= 0f)
             {
-                _cooldownRemaining = INITIAL_COOLDOWN;
+                _cooldownRemaining = EntityStats.BASE_PLAYER_COOLDOWN;
                 Fire(registry, player.Position);
             }
         }
@@ -49,15 +46,16 @@ namespace Sim.Systems
             registry.TryCreateEntity(EntityType.Bullet, out var bullet);
             EntityData bulletData = registry[bullet];
             SimVec2 direction = (_inputContainer.Input.MousePosition - playerPosition).normalized;
-            Debug.Log(direction);
             if (direction.Equals(SimVec2.zero))
             {
                 direction = SimVec2.right;
             }
                 
-            bulletData.Velocity = direction;
+            bulletData.Velocity = direction * EntityStats.BASE_BULLET_SPEED;
+            bulletData.Position = playerPosition;
             bulletData.Health = 1;
-            bulletData.Damage = EntityStats.BULLET_DAMAGE;
+            bulletData.Radius = 0.5f;
+            bulletData.Damage = EntityStats.BASE_BULLET_DAMAGE;
             registry[bullet] = bulletData;
         }
     }

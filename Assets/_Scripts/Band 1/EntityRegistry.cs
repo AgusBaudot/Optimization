@@ -83,10 +83,13 @@ namespace Sim.Entities
             {
                 return false;
             }
+
             int id = _entityIds.Dequeue();
             int gen = _entityGenerations[id] += 1;
+
             //Since it's a struct, it initializes a value type on the stack, generating 0 garbage.
             entityId = new EntityId(id, gen);
+
             return true;
         }
         

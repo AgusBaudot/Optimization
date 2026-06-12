@@ -76,25 +76,6 @@ namespace Sim.View
                     // Dead, but still in dict? Despawn it.
                     Despawn(entity);
                 }
-
-                ////If snapshot has entity that's alive and not in dictionary, Spawn.
-                //if (entity.State == EntityState.Alive && !_activeViews.ContainsKey(entity.EntityId))
-                //{
-                //    Spawn(entity);
-                //}
-
-                ////If snapshot has entity that's not alive and in dictionary, Died.
-                //if (entity.State != EntityState.Alive && _activeViews.ContainsKey(entity.EntityId))
-                //{
-                //    Despawn(entity);
-                //}
-
-                ////If snapshot has entity that's alive and in dict, Update.
-                //if (entity.State == EntityState.Alive && _activeViews.TryGetValue(entity.EntityId, out var entityView))
-                //{
-                //    Vector3 position = new Vector3(entity.Position.x, entity.Position.y);
-                //    entityView.transform.position = position;
-                //}
             }
         }
 
